@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✌ GrooveBox — Vintage Music Player</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Caveat:wght@400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="grain-overlay"></div>
+  <div class="psychedelic-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="logo-icon">☮</span>
+        <span class="logo-text">GrooveBox</span>
+      </div>
+      <div class="header-tagline">peace · love · music</div>
+      <button class="add-music-btn" id="addMusicBtn" title="Add Music">
+        <span>＋ Add Tracks</span>
+      </button>
+      <input type="file" id="fileInput" accept="audio/*" multiple hidden />
+    </header>
+
+    <div class="main-layout">
+      <!-- LEFT: LIBRARY -->
+      <aside class="library-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">✦ My Grooves</h2>
+          <div class="library-controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search tracks…" />
+            <div class="sort-row">
+              <select class="sort-select" id="sortSelect">
+                <option value="added">Recently Added</option>
+                <option value="name">Name A–Z</option>
+                <option value="artist">Artist</option>
+                <option value="duration">Duration</option>
+              </select>
+              <button class="view-toggle" id="viewToggle" title="Toggle View">⊞</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="track-list" id="trackList">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">𝄞</div>
+            <p>Drop your music here<br/><em>or click "Add Tracks" above</em></p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: NOW PLAYING -->
+      <main class="player-panel">
+        <div class="player-inner">
+          <!-- Album Art -->
+          <div class="album-art-container" id="albumArtContainer">
+            <div class="album-art-ring ring-outer"></div>
+            <div class="album-art-ring ring-mid"></div>
+            <div class="album-art" id="albumArt">
+              <div class="default-art">
+                <span class="default-art-icon">♪</span>
+              </div>
+              <img id="albumArtImg" src="" alt="Album Art" hidden />
+            </div>
+            <div class="album-art-ring ring-inner"></div>
+            <div class="vinyl-hole"></div>
+          </div>
+
+          <!-- Track Info -->
+          <div class="track-info">
+            <div class="track-title-wrap">
+              <h1 class="track-title" id="trackTitle">No Track Playing</h1>
+            </div>
+            <p class="track-artist" id="trackArtist">— select a groove —</p>
+          </div>
+
+          <!-- Waveform Visualizer -->
+          <div class="visualizer-wrap">
+            <canvas id="visualizer" class="visualizer"></canvas>
+          </div>
+
+          <!-- Progress / Waveform Bar -->
+          <div class="progress-section">
+            <span class="time-label" id="currentTime">0:00</span>
+            <div class="progress-bar-wrap" id="progressBarWrap">
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="trim-region" id="trimRegion" hidden>
+                  <div class="trim-handle trim-start" id="trimStart"></div>
+                  <div class="trim-handle trim-end" id="trimEnd"></div>
+                </div>
+                <div class="progress-thumb" id="progressThumb"></div>
+              </div>
+            </div>
+            <span class="time-label" id="totalTime">0:00</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="controls-section">
+            <div class="controls-top">
+              <button class="ctrl-btn ctrl-secondary" id="shuffleBtn" title="Shuffle">⇄</button>
+              <button class="ctrl-btn ctrl-secondary" id="prevBtn" title="Previous">⏮</button>
+              <button class="ctrl-btn ctrl-play" id="playBtn" title="Play/Pause">
+                <span class="play-icon">▶</span>
+              </button>
+              <button class="ctrl-btn ctrl-secondary" id="nextBtn" title="Next">⏭</button>
+              <button class="ctrl-btn ctrl-secondary" id="repeatBtn" title="Repeat">↻</button>
+            </div>
+            <div class="controls-bottom">
+              <button class="ctrl-btn ctrl-sm" id="trimBtn" title="Trim Audio">✂ Trim</button>
+              <button class="ctrl-btn ctrl-sm" id="boostBtn" title="Bass Boost">🎸 Bass</button>
+              <div class="volume-wrap">
+                <span class="vol-icon" id="muteBtn" title="Mute">🔊</span>
+                <input type="range" class="vol-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
+              </div>
+              <button class="ctrl-btn ctrl-sm" id="speedBtn" title="Playback Speed">1×</button>
+            </div>
+          </div>
+
+          <!-- Equalizer -->
+          <div class="eq-section" id="eqSection">
+            <div class="eq-header">
+              <span class="eq-label">Equalizer</span>
+              <button class="eq-toggle-btn" id="eqToggle">ON</button>
+            </div>
+            <div class="eq-bands" id="eqBands">
+              <div class="eq-band" data-freq="60" data-label="Bass">
+                <input type="range" class="eq-slider" orient="vertical" min="-12" max="12" value="0" />
+                <span class="eq-freq">60Hz</span>
+              </div>
+              <div class="eq-band" data-freq="250" data-label="Low-Mid">
+                <input type="range" class="eq-slider" orient="vertical" min="-12" max="12" value="0" />
+                <span class="eq-freq">250Hz</span>
+              </div>
+              <div class="eq-band" data-freq="1000" data-label="Mid">
+                <input type="range" class="eq-slider" orient="vertical" min="-12" max="12" value="0" />
+                <span class="eq-freq">1kHz</span>
+              </div>
+              <div class="eq-band" data-freq="4000" data-label="Hi-Mid">
+                <input type="range" class="eq-slider" orient="vertical" min="-12" max="12" value="0" />
+                <span class="eq-freq">4kHz</span>
+              </div>
+              <div class="eq-band" data-freq="16000" data-label="Treble">
+                <input type="range" class="eq-slider" orient="vertical" min="-12" max="12" value="0" />
+                <span class="eq-freq">16kHz</span>
+              </div>
+            </div>
+            <div class="eq-presets">
+              <button class="preset-btn" data-preset="flat">Flat</button>
+              <button class="preset-btn" data-preset="rock">Rock</button>
+              <button class="preset-btn" data-preset="jazz">Jazz</button>
+              <button class="preset-btn" data-preset="bass">Heavy Bass</button>
+              <button class="preset-btn" data-preset="vocal">Vocal</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT: QUEUE / PLAYLISTS -->
+      <aside class="queue-panel">
+        <div class="panel-header">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="queue">Up Next</button>
+            <button class="tab-btn" data-tab="playlists">Playlists</button>
+            <button class="tab-btn" data-tab="favorites">♥ Faves</button>
+          </div>
+        </div>
+
+        <div class="tab-content active" id="tab-queue">
+          <div class="queue-list" id="queueList">
+            <div class="empty-state">
+              <div class="empty-icon" style="font-size:2rem">♫</div>
+              <p>Your queue is empty</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-playlists">
+          <div class="playlist-controls">
+            <input type="text" class="search-input" id="newPlaylistInput" placeholder="New playlist name…" />
+            <button class="add-music-btn small" id="createPlaylistBtn">Create</button>
+          </div>
+          <div class="playlist-list" id="playlistList">
+            <div class="empty-state">
+              <p>No playlists yet</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-favorites">
+          <div class="fav-list" id="favList">
+            <div class="empty-state">
+              <div class="empty-icon" style="font-size:2rem">♡</div>
+              <p>No favorites yet<br/><em>Heart a track to save it</em></p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- TRIM MODAL -->
+  <div class="modal-overlay" id="trimModal" hidden>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>✂ Trim Track</h3>
+        <button class="modal-close" id="trimModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-track-name" id="trimTrackName"></p>
+        <div class="trim-preview">
+          <canvas id="trimWaveform" class="trim-waveform"></canvas>
+          <div class="trim-handles-preview">
+            <div class="trim-handle-preview start" id="trimStartHandle"></div>
+            <div class="trim-region-preview" id="trimRegionPreview"></div>
+            <div class="trim-handle-preview end" id="trimEndHandle"></div>
+          </div>
+        </div>
+        <div class="trim-times">
+          <div class="trim-time-input">
+            <label>Start</label>
+            <input type="number" id="trimStartTime" min="0" step="0.1" value="0" />
+            <span>sec</span>
+          </div>
+          <div class="trim-time-input">
+            <label>End</label>
+            <input type="number" id="trimEndTime" min="0" step="0.1" value="0" />
+            <span>sec</span>
+          </div>
+        </div>
+        <div class="trim-preview-controls">
+          <button class="ctrl-btn ctrl-secondary" id="trimPreviewBtn">▶ Preview Trim</button>
+          <button class="ctrl-btn ctrl-play" id="trimApplyBtn">Apply Trim</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED MODAL -->
+  <div class="modal-overlay" id="speedModal" hidden>
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>⏩ Playback Speed</h3>
+        <button class="modal-close" id="speedModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="speed-options">
+          <button class="speed-opt" data-speed="0.5">0.5×</button>
+          <button class="speed-opt" data-speed="0.75">0.75×</button>
+          <button class="speed-opt active" data-speed="1">1×</button>
+          <button class="speed-opt" data-speed="1.25">1.25×</button>
+          <button class="speed-opt" data-speed="1.5">1.5×</button>
+          <button class="speed-opt" data-speed="2">2×</button>
+        </div>
+        <div class="speed-custom">
+          <label>Custom</label>
+          <input type="range" id="speedCustom" min="0.25" max="3" step="0.05" value="1" />
+          <span id="speedCustomVal">1×</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- DROP ZONE -->
+  <div class="drop-zone-overlay" id="dropZone" hidden>
+    <div class="drop-zone-inner">
+      <div class="drop-icon">♫</div>
+      <p>Drop your music here</p>
+    </div>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

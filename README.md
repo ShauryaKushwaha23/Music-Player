@@ -6,6 +6,11 @@ Your music is **stored forever** in your browser's IndexedDB — it survives pag
 
 ---
 
+<img width="1915" height="904" alt="Screenshot 2026-06-18 094321" src="https://github.com/user-attachments/assets/6fcee817-6083-450c-a040-45dd6307f044" />
+<img width="1884" height="897" alt="Screenshot 2026-06-18 094306" src="https://github.com/user-attachments/assets/dace845c-3384-41ea-b097-d43bcf39ac5b" />
+<img width="1914" height="910" alt="Screenshot 2026-06-18 094243" src="https://github.com/user-attachments/assets/aecf206f-327e-4895-86a4-8170db2557f5" />
+
+
 ## ✦ Features
 
 | Feature | Description |
